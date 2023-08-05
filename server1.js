@@ -17,21 +17,6 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get('/', (req,res) =>  {
-    res.send('Running Proxy Server!...');
-});
-
-app.get('/status/:url', async (req, res) => {
-  const { url } = req.params;
-  try {
-    const response = await axios.get(url);
-    res.json({ status: response.status });
-  } catch (error) {
-    console.error(error);
-    res.json({ status: error.response ? error.response.status : 'offline' });
-  }
-});
-
-app.get('/healthcheck/', async (req, res) => {
     let output = [];
     await readCheckList();
     let getStatus = async (webSite) => {
@@ -72,6 +57,59 @@ app.get('/healthcheck/', async (req, res) => {
     }  
     process();
 });
+
+app.get('/status/:url', async (req, res) => {
+  const { url } = req.params;
+  try {
+    const response = await axios.get(url);
+    res.json({ status: response.status });
+  } catch (error) {
+    console.error(error);
+    res.json({ status: error.response ? error.response.status : 'offline' });
+  }
+});
+
+// app.get('/healthcheck/', async (req, res) => {
+//     let output = [];
+//     await readCheckList();
+//     let getStatus = async (webSite) => {
+//         let site = { ...webSite };
+//         let count = []
+//         for (j = 0; j<site.apps.length; j++){
+//             try {
+//                 const response = await axios.get(site.apps[j].app);
+//                 site.apps[j].status = response.status === 200 ? 'UP' : 'DOWN'; // response.status;
+//                 response.status === 200 ? count.push('UP') : count.push('DOWN');
+//                 site.apps[j].scode = response.status
+//             } catch (error) {
+//                 console.error(error);
+//                 site.apps[j]={...site.apps[j], status:'DOWN'};
+//                 site.apps[j].scode = 'Unable to reach URL';
+//                 count.push('DOWN');
+//             }
+//         }
+//         if(count.includes('DOWN')){
+//             site.App_Status = 'Amber'
+//         }else{
+//             site.App_Status = 'Green'
+//         }
+//         count = []
+//         // try {
+//         //     const response = await axios.get(site.url);
+//         //     site.status = response.status === 200 ? 'UP' : 'DOWN'; // response.status;
+//         // } catch (error) {
+//         //     console.error(error);
+//         //     site.status = error.response ? error.response.status : 'DOWN';
+//         // }
+//         output.push(site);
+//     };
+
+//     let process = async () => {
+//         await asyncForEach(websites.recipes, getStatus);
+//         res.json(output);
+//     }  
+//     process();
+// });
 // done below
 async function readCheckList() {
     const fs = require('fs');
